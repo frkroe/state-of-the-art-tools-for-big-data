@@ -5,10 +5,10 @@ This repository contains hands-on exercises for the "State of the Art Tools for 
 
 Throughout this course, you will learn to:
 - **Ingest data** using Airbyte
-- **Process data** using Apache Spark SQL
 - **Orchestrate workflows** using Mage AI
-- **Transform data** using dbt
+- **Process data** using Apache Spark SQL
 - **Perform single-node processing** using Polars and store data in DuckDB
+- **Transform data** using dbt
 - **Implement semantic search** by storing data in Qdrant vector databases
 
 
