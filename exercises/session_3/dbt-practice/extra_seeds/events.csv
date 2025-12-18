@@ -1,0 +1,31 @@
+event_id,event_name,event_date,event_type,location,host_user_id,price_per_ticket,total_tickets
+201,Digital Marketing Summit,2023-02-10,Workshop,Virtual,1,50.0,100
+202,AI & Data Conference,2023-03-15,Conference,San Francisco,2,150.0,200
+203,Networking Meetup,2023-04-10,Meetup,New York,3,10.0,50
+204,UX/UI Design Bootcamp,2023-05-05,Workshop,Virtual,4,100.0,50
+205,Blockchain Expo,2023-06-22,Conference,Virtual,5,200.0,300
+206,Startup Pitch Night,2023-07-12,Meetup,Boston,6,20.0,100
+207,Python Developer Summit,2023-08-18,Conference,Virtual,7,120.0,200
+208,Art & Creativity Fair,2023-09-25,Fair,Chicago,8,15.0,150
+209,Mental Health Workshop,2023-10-03,Workshop,Virtual,9,25.0,50
+210,Photography Masterclass,2023-11-01,Workshop,Virtual,10,80.0,75
+211,Cybersecurity Seminar,2023-12-05,Workshop,Virtual,1,75.0,50
+212,React Native Workshop,2023-12-15,Workshop,Los Angeles,2,60.0,75
+213,Blockchain Networking,2024-01-20,Meetup,New York,3,15.0,50
+214,Photography Exhibition,2024-02-10,Fair,Chicago,4,20.0,150
+215,AI Ethics Conference,2024-03-05,Conference,San Francisco,5,180.0,200
+216,Data Science Hackathon,2024-03-22,Competition,Virtual,6,120.0,100
+217,Creative Writing Meetup,2024-04-08,Meetup,Seattle,7,10.0,50
+218,Virtual Reality Expo,2024-05-15,Fair,Virtual,8,200.0,300
+219,Mobile App Design Bootcamp,2024-06-01,Workshop,Los Angeles,9,100.0,75
+220,Coding for Kids Workshop,2024-06-25,Workshop,Virtual,10,30.0,40
+221,Green Tech Conference,2024-07-10,Conference,Boston,1,150.0,200
+222,AI and Healthcare Symposium,2024-08-20,Conference,New York,2,250.0,300
+223,Web 3.0 and NFTs Meetup,2024-09-05,Meetup,San Francisco,3,20.0,80
+224,Digital Nomad Networking,2024-09-25,Meetup,Austin,4,15.0,60
+225,Career Development Bootcamp,2024-10-10,Workshop,Virtual,5,70.0,100
+226,Creative Coding Workshop,2024-11-01,Workshop,San Francisco,6,90.0,50
+227,Sustainable Living Fair,2024-11-20,Fair,Chicago,7,25.0,200
+228,Leadership Summit,2024-12-02,Conference,New York,8,300.0,150
+229,Tech Innovators Expo,2024-12-10,Fair,Los Angeles,9,50.0,400
+230,Public Speaking Bootcamp,2024-12-20,Workshop,Virtual,10,40.0,50
