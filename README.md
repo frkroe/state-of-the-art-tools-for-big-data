@@ -4,35 +4,40 @@
 This repository contains hands-on exercises for the "State of the Art Tools for Big Data" course at UPV's master *Inteligencia Artificial & Big Data Analytics*. The course provides practical experience with cutting-edge Big Data technologies and industry-leading tools.
 
 Throughout this course, you will learn to:
-- **Ingest data** using Airbyte
-- **Orchestrate workflows** using Mage AI
-- **Process data** using Apache Spark SQL
-- **Perform single-node processing** using Polars and store data in DuckDB
-- **Transform data** using dbt
-- **Implement semantic search** by storing data in Qdrant vector databases
-
+- **Ingest data** using [Airbyte](https://airbyte.com/)
+- **Orchestrate workflows** using [Mage AI](https://www.mage.ai/)
+- **Process data** using [Apache Spark SQL](https://spark.apache.org/sql/)
+- **Perform single-node processing** using [Polars](https://pola.rs/) and store data in [DuckDB](https://duckdb.org/)
+- **Transform data** using [dbt](https://www.getdbt.com/)
+- **Implement semantic search** by storing data in [Qdrant](https://qdrant.tech/) vector databases
+- **Develop a chatbot** using [n8n](https://n8n.io/)
 
 ![Architecture Diagram](./img/architecture.png)
 
+Each session will cover some of the technologies and has its own exercises:
+
+* **Session 1: Data Ingestion and Spark SQL**:
+  * Technologies: Airbyte, Mage and SparkSQL
+  * [Exercises](exercises/session_1)
+* **Session 2: Single-node processing**:
+  * Technologies: Airbyte, Mage and SparkSQL
+  * [Exercises](exercises/session_2)
+* **Session 3: dbt**:
+  * Technologies: Airbyte, Mage and SparkSQL
+  * [Exercises](exercises/session_3)
+* **Session 4: Vector databases**:
+  * Technologies: Airbyte, Mage and SparkSQL
+  * [Exercises](exercises/session_4)
 
 ## 🚀 Setup Instructions
 
 ### Software Requirements
 
-* Docker
-* Python
-* Visual Studio Code
+* Docker (https://docs.docker.com/desktop/)
+* Python (https://www.python.org/downloads/)
+* Visual Studio Code (https://code.visualstudio.com/docs/setup/setup-overview)
 
 ### Initial Setup
 
 1. Clone this repository
-2. Change to the newly created folder
-3. Install Airbyte for local use by following the [Airbyte Quickstart Guide](https://docs.airbyte.com/platform/using-airbyte/getting-started/oss-quickstart)
-4. Download the latest version of the image files
-   ```bash
-   docker compose pull
-   ```
-5. (Option) Launch all services
-   ```bash
-   docker compose up -d
-   ```
+1. Each exercise has its own docker compose (if required). Change to that folder and follow the instructions.
