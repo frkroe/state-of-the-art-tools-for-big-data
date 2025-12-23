@@ -9,7 +9,7 @@ Throughout this course, you will learn to:
 - **Process data** using [Apache Spark SQL](https://spark.apache.org/sql/)
 - **Perform single-node processing** using [Polars](https://pola.rs/) and store data in [DuckDB](https://duckdb.org/)
 - **Transform data** using [dbt](https://www.getdbt.com/)
-- **Implement semantic search** by storing data in [Qdrant](https://qdrant.tech/) vector databases
+- **Implement semantic search** by storing data in [Qdrant](https://qdrant.tech/) and [PostgreSQL (pg_vector)](https://github.com/pgvector/pgvector) vector databases
 - **Develop a chatbot** using [n8n](https://n8n.io/)
 
 ![Architecture Diagram](./img/architecture.png)
@@ -20,13 +20,13 @@ Each session will cover some of the technologies and has its own exercises:
   * Technologies: Airbyte, Mage and SparkSQL
   * [Exercises](exercises/session_1)
 * **Session 2: Single-node processing**:
-  * Technologies: Airbyte, Mage and SparkSQL
+  * Technologies: Polars, NVIDIA RAPIDS and DuckDB
   * [Exercises](exercises/session_2)
 * **Session 3: dbt**:
-  * Technologies: Airbyte, Mage and SparkSQL
+  * Technologies: dbt and DuckDB
   * [Exercises](exercises/session_3)
 * **Session 4: Vector databases**:
-  * Technologies: Airbyte, Mage and SparkSQL
+  * Technologies: PostgreSQL (pg_vector), Qdrant and n8n
   * [Exercises](exercises/session_4)
 
 ## 🚀 Setup Instructions
