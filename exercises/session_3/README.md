@@ -44,11 +44,9 @@ Follow the instructions in VSC, choosing a directory to clone the repo in your c
 
 After successfully cloning the repo, open it in VSC and open a terminal by clicking choosing *Terminal* 🡢 *New terminal* in the upmost menu.
 
-Once you open the terminal, go to the *PRO-000-dbt* directory:
+Once you open the terminal, go to the directory:
 
-```
-cd Sessions/PRO-Processing/PRO-000-dbt/
-```
+
 
 After that, we need to run a container where dbt Core will be installed and run:
 
