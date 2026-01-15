@@ -1,6 +1,4 @@
-# dbt (Data Build Tool) Practical Excercises
-
-## Introduction
+# dbt (Data Build Tool) — Practical Exercises 
 
 This repo contains the code and instructions for practical exercises that will teach the basics of [**dbt (Data Build Tool)**](https://docs.getdbt.com/docs/introduction#dbt-core), a **transformation workflow tool** designed to help analysts and data engineers **transform and test their data as code**, following software engineering best practices.
 
@@ -11,9 +9,54 @@ By completing these exercises, you will learn about the essential components of 
 - **Models**: these are SQL-based files that define your transformations.
 - **Tests**: these can be written to validate assumptions about your data, such as checking for null values, uniqueness, or referential integrity.
 - **Documentation**: dbt offers features for documenting your data models and their relationships.
+  
+## Technologies used
 
-## Practical Excercise - Jaffle Shop
+The exercises are based on:
 
+- **dbt Core**
+- **DuckDB** as an embedded analytical database
+- **duckcli** as a command-line tool to inspect DuckDB
+
+## Execution model
+
+Everything runs locally inside a **single Docker container**.
+
+- No external database
+- No cluster
+- No scheduler
+- No additional services
+
+This setup is intentionally simple to focus entirely on **dbt concepts and workflows**.
+
+## What you will learn
+
+By completing these exercises, you will learn:
+
+- What dbt is and which problems it solves
+- How dbt models are defined using SQL files
+- How dbt executes SQL and materializes tables and views
+- Why the staging layer exists and how to design it
+- How to build analytics-ready models with joins and aggregations
+- How to add data quality tests using `schema.yml`
+- How dbt documentation works and how it is generated
+- How to reuse SQL logic using macros
+- How dbt is used in a real workflow with `dbt build`, `dbt test`, and model selection
+
+## Project overview
+
+This project uses the fictional **Jaffle Shop** dataset, which contains:
+
+- **customers**: customer information  
+- **orders**: orders placed by customers  
+- **payment**: payments made for orders  
+
+The dbt project follows a **layered approach**:
+
+Raw data (CSV seeds)  
+→ Staging models (views)  
+→ Core models (tables)  
+→ Tests and documentation  
 To learn about the dbt core elements, we will use an example with data for a fictional Jaffle Shop.
 
 The Jaffle Shop dataset has data about its **customers**, **orders** and **payments**. The columns for each table, as well as the relationships between them, can be seen in the following Entity Relationship Diagram:
@@ -28,33 +71,26 @@ We will create models that will be **materialized as views and tables** in a [**
   <img src="./images/dbt-diagram-background.png" alt="Jaffle Shop dbt diagram" width="750px" height="300px">
 </div>
 
-### Excercise setup
+## Exercise setup
 
-Before going into the excercises, it is necessary to setup the dbt project locally.
+### Requirements
 
-To do that, you first need to **clone this repository** to your local computer.
+- Docker installed and running
+- Repository cloned locally
+- Visual Studio Code is recommended
 
-We will use Visual Studio Code (VSC) as the Integrated Development Environment (IDE) for the excercises, so the repo can be cloned using the *Open in your IDE* option and selecting *Visual Studio Code (HTTPS)* when cloning the project:
+### Step 1 — Move to the exercise directory
 
-<div style="text-align: center;">
-  <img src="./images/clone_to_vsc.png" alt="Screenshot of the Open in your IDE options when cloning in GitLab" width="300px" height="270px">
-</div>
+    cd exercises/session_3/
 
-Follow the instructions in VSC, choosing a directory to clone the repo in your computer and making sure you log in to your GitLab account.
+You should see a `src/` directory.
 
-After successfully cloning the repo, open it in VSC and open a terminal by clicking choosing *Terminal* 🡢 *New terminal* in the upmost menu.
+### Step 2 — Run the container (single container)
 
-Once you open the terminal, go to the directory:
+    docker run --name dbt_container -it -v ${PWD}/src:/app/src -p 8080:8080 python:3.10-slim /bin/bash
 
-
-
-After that, we need to run a container where dbt Core will be installed and run:
-
-```
-docker run --name dbt_container -it -v ${PWD}/src:/app/src -p 8080:8080 python:3.10-slim /bin/bash
-```
-
-This command sets up a Python environment, allowing you to work within the container while having access to your local project files located in the src folder.
+This starts a single container with Python installed.  
+DuckDB runs as an embedded database inside this container.
 
 Here's a breakdown of the options used in this command:
 
@@ -68,245 +104,409 @@ Here's a breakdown of the options used in this command:
 - `python:3.10-slim`: This specifies the image to use. In this case, it pulls the `python:3.10-slim` image, which is a lightweight version of Python 3.10, suitable for installing dbt Core.
 - `/bin/bash`: This is the command that runs inside the container, opening a Bash shell for further interaction.
 
-Once the container is running and the Bash shell is open, you can go to the src folder:
 
-```
-cd app/src/
-```
 
-After navigating to the src folder, use the following command to install the [required libraries](./src/requirements.txt):
+### Step 3 — Install dependencies inside the container
 
-```
-pip install -r requirements.txt
-```
+    cd /app/src
+    pip install -r requirements.txt
 
 Within the installed libraries, the following are the most important in the context of this setup:
 
-- **`dbt-duckdb~=1.5.0`**: This is the DuckDB adapter for dbt (Data Build Tool). By installing `dbt-duckdb`, you also install `dbt-core`.
-- **`duckcli~=0.2.1`**: A command-line interface (CLI) tool for interacting with DuckDB. It provides a convenient way to query, inspect, and manage DuckDB databases directly from the terminal. This tool is especially useful for quickly testing SQL queries or exploring your database.
-
-### Excercise 1: Model Creation
-
-#### Staging Models
-
-- **Objectives**: Create the staging models for all three tables, **stg_customers**, **stg_orders** and **stg_products**, and materialize them as **views** in the DuckDB database.
-- **Instructions**:
-
-  - Create a folder named **staging** within the **models** folder for the SQL files that will define the models.
-  - Modify the [`dbt_project.yml`](./src/jaffle_shop/dbt_project.yml) file to indicate that models within the staging folder will be materialized as views.
-  - Create the SQL model files in the staging folder. **The files name will be the name of the model**. The staging views will simply select all columns from the original raw tables, but renaming some columns:
-    - customers:
-      - id as customer_id
-    - orders:
-      - id as order_id
-      - user_id as customer_id
-    - payment:
-      - id as payment_id
-      - amount / 100 as amount
-  - Create a file named `schema.yml` within the staging folder and write down the columns for all models.
-  - Build each model individually or all at once with the `dbt build` command.
-  - Check if the views were created by selecting their data in the DuckDB database using duckcli.
-- **Commands**:
-
-  - Load CSV files with `dbt seed`:
-
-  ```
-  dbt seed
-  ```
-
-  - Compile a single model with `dbt build`:
-
-  ```
-   dbt build -f -s <model_name>
-  ```
+dbt-duckdb~=1.5.0: This is the DuckDB adapter for dbt (Data Build Tool). By installing dbt-duckdb, you also install dbt-core.
+duckcli~=0.2.1: A command-line interface (CLI) tool for interacting with DuckDB. It provides a convenient way to query, inspect, and manage DuckDB databases directly from the terminal. This tool is especially useful for quickly testing SQL queries or exploring your database.
 
-  - Compile all models:
+### Step 4 — Move into the dbt project
 
-  ```
-  dbt build
-  ```
+    cd /app/src/jaffle_shop
 
-  - Run duckcli and select from table:
+## Exercise 0 — Sanity checks
 
-  ```
-  cd app/src/jaffle_shop/
-  ```
+### Goal
 
-  ```
-  duckcli jaffle_shop.duckdb
-  ```
+Verify that dbt is installed, DuckDB can be created, and raw data loads correctly.
 
-  ```
-  select * from <table_name>;
-  ```
+### Check dbt installation
 
-  - Close duckcli:
+    dbt --version
 
-  ```
-  exit
-  ```
+### Load raw CSV files (seeds)
 
-**Additional info**: By using the `dbt build` command we are running `dbt run` to run the models and `dbt test`, which will validate information in the `schema.yml` file with the data and the model that is being created.
+    dbt seed
 
-#### Other Models
+This creates raw tables in DuckDB:
 
-- **Objectives**: Create the **customers_orders**, **customers_payments** and **customers_orders_payments** models and materialize them as **tables** in the DuckDB database.
-- **Instructions**:
+- customers
+- orders
+- payment
 
-  - Modify the [`dbt_project.yml`](./src/jaffle_shop/dbt_project.yml) file to indicate that models within the models folder will be materialized as tables.
-  - Create the SQL model files in the models folder. **The files name will be the name of the model**. The created tables will join data from the staging views and will have the following columns:
-    | **customers_orders** |
-    | -------------------------- |
-    | customer_id                |
-    | customer_full_name         |
-    | first_order                |
-    | most_recent_order          |
-    | number_of_orders           |
+A file named `jaffle_shop.duckdb` is created.
 
-    | **customers_payments** |
-    | ---------------------------- |
-    | customer_id                  |
-    | number_of_orders             |
-    | total_amount                 |
+### (Optional) Inspect raw tables
 
-    | **customers_orders_payments** |
-    | ----------------------------------- |
-    | customer_id                         |
-    | customer_full_name                  |
-    | first_order                         |
-    | most_recent_order                   |
-    | number_of_orders                    |
-    | total_amount                        |
-  - Create a file named `schema.yml` within the models folder and write down the columns for all tables.
-  - Build each model individually or all at once with the `dbt build` command.
-  - Check if the tables were created by selecting their data in the DuckDB database using duckcli.
-- **Commands**:
+    duckcli jaffle_shop.duckdb
+    show tables;
+    select * from customers limit 5;
+    select * from orders limit 5;
+    select * from payment limit 5;
+    exit
 
-  - Compile a single model with `dbt build`:
+If these queries work, the environment is ready.
 
-  ```
-   dbt build -f -s <model_name>
-  ```
+## Exercise 1 — Staging layer (views)
 
-  - Compile all models:
+### Goal
 
-  ```
-  dbt build
-  ```
+Create staging models that clean raw data, rename columns consistently, apply very small transformations, and contain no business logic.
 
-  - Run duckcli and select from table:
+All staging models are materialized as views.
 
-  ```
-  cd app/src/jaffle_shop/
-  ```
+### Create the staging folder
 
-  ```
-  duckcli jaffle_shop.duckdb
-  ```
+    models/staging/
 
-  ```
-  select * from <table_name>;
-  ```
+### Create the following staging models
 
-  - Close duckcli:
+#### stg_customers.sql
 
-  ```
-  exit
-  ```
+This model renames the primary key and selects only relevant columns.
 
-**Additional info**: By using the `dbt build` command we are running `dbt run` to run the models and `dbt test`, which will validate information in the `schema.yml` file with the data and the model that is being created.
+Hint:
+- Start from the raw `customers` table.
+- Rename the `id` column to `customer_id`.
+- Select only the columns that make sense for downstream models (avoid `select *`).
 
-- **Useful links**:
-  - [dbt Docs on SQL Models](https://docs.getdbt.com/docs/build/sql-models)
+#### stg_orders.sql
 
-### Excercise 2: Tests creation
+This model normalizes foreign keys and keeps relevant order attributes.
 
-- **Objective**: Understand dbt's testing capabilities by adding schema tests to ensure data quality.
-- **Instructions**:
+Hint:
+- Start from the raw `orders` table.
+- Rename `id` to `order_id`.
+- Rename `user_id` to `customer_id` to standardize the join key name.
+- Keep the columns needed later (e.g., date and status).
 
-  - Modify the models `schema.yml` files to add the following tests:
-    - Unique and non-null values for all primary keys.
-    - Accepted values for orders status: 'placed', 'shipped', 'completed', 'return_pending', 'returned'.
-    - Relationships between columns
-  - Run `dbt test` command to run the tests.
-- **Commands**:
+#### stg_payments.sql
 
-  - Run tests:
+This model converts amounts from cents to the main currency unit and normalizes column names.
 
-  ```
-  dbt test
-  ```
-- **Useful links**:
+Hint:
+- Start from the raw `payment` table.
+- Rename `id` to `payment_id`.
+- Convert `amount` from cents to currency by dividing by 100 (use a decimal like `100.0`).
+- Keep method and status columns for later analysis.
 
-  - [dbt Docs on Tests](https://docs.getdbt.com/docs/build/data-tests)
+### Configure staging models to be materialized as views
 
-### Excercise 3: Documentation creation
+Edit `dbt_project.yml` and configure the `staging` folder so models are materialized as `view`.
 
-- **Objectives**: understand, generate and customize dbt documentation.
-- **Instructions**:
+Hint:
+- Use the `models:` section and scope the config to the `jaffle_shop` project and the `staging` directory.
 
-  - Generate, run and explore the default documentation by running the `dbt docs generate` and `dbt docs serve` commands.
-  - Add descriptions for models and columns in `schema.yml` files.
-  - Create a Markdown file named `docs.md` with the description for a field and use it for a column description in the `schema.yml` files.
-  - Override the default overview for the documentation web's first page by creating a `overview.md` file.
-- **Commands**:
+### Add staging schema file
 
-  - Generate documentation:
+Create a `schema.yml` file inside `models/staging/` to describe the staging models and their columns.
 
-  ```
-  dbt docs generate
-  ```
+This file does not execute SQL.  
+It is used for documentation and tests.
 
-  - Serve documentation in website:
+Hint:
+- Add entries under `models:` for each staging model.
+- Include at least the model name and a minimal columns list.
 
-  ```
-  dbt docs serve
-  ```
-- **Useful links**:
+### Build staging models
 
-  - [dbt Docs on Documentation](https://docs.getdbt.com/docs/build/documentation)
+    dbt build -s staging
 
-## Extra: Practical Excercise - EventSpark
+## Exercise 2 — Core models (tables)
 
-To put to practice the concept learned with the first practical example, a second one has been prepared.
+### Goal
 
-The [extra_seeds](./extra_seeds/) folder contains a dataset for **a fictional online event management platform** called **EventSpark**, which allows users to create and attend events. This could involve users registering for events, making payments for tickets, and tracking event details.
+Create analytics-ready tables using staging models only.
 
-The dataset includes three tables, **users**, **events**, and **tickets**, with the following ER Diagram:
+Models to build:
+- customers_orders
+- customers_payments
+- customers_orders_payments
 
-<div style="text-align: center;">
-  <img src="./images/eventspark_dr.png" alt="EventSpark ER Diagram" width="400px" height="500px">
-</div>
+### Configure core models to be materialized as tables
 
-The new data can be used to practice anything with dbt, but here are some **proposed excercises**:
+Update `dbt_project.yml` so that:
+- models are materialized as `table` by default
+- staging models remain materialized as `view`
 
-### 1. **Users Model**:
+Hint:
+- You will need a `models:` section scoped to `jaffle_shop`.
+- Set `+materialized: table` at the project level and override `staging` to `view`.
 
-- **Objective**: Create a `users.sql` model to clean and transform the user data.
-- **Example transformations**: clean up email domains, and flag users based on region.
+### customers_orders.sql
 
-### 2. **Events Model**:
+This model creates customer-level order metrics.
 
-- **Objective**: Create an `events.sql` model to analyze event types and event capacity.
-- **Example transformations**: calculate remaining tickets, event attendance rates.
+Hints:
+- Always read from staging models (use `ref()`), not raw tables.
+- Create a `customers` CTE reading from the staging customers model.
+- Create an `orders` CTE reading from the staging orders model.
+- Join customers to orders using `customer_id` with a LEFT JOIN.
+- Build these fields:
+  - customer_id
+  - customer_full_name (concatenate first_name and last_name)
+  - first_order (min order_date)
+  - most_recent_order (max order_date)
+  - number_of_orders (count orders)
+- Group by customer fields.
 
-### 3. **Tickets Model**:
+### customers_payments.sql
 
-- **Objective**: Create a `tickets.sql` model to join ticket sales with users and events.
-- **Example transformations**: calculate total revenue per event, group by payment method, or region of users.
+This model calculates customer-level payment metrics based on successful payments.
 
-### 4. **Model Tests**:
+Hints:
+- Start from staging orders and staging payments using `ref()`.
+- Filter payments to only the successful ones (based on `status`).
+- Join payments to orders by `order_id` to connect payments to customers.
+- Produce:
+  - customer_id
+  - number_of_orders (count distinct orders)
+  - total_amount (sum payment amount)
+- Group by customer_id.
 
-- **Objective**: Add tests to ensure that:
-  - `user_id` is unique in the `users` table.
-  - `event_id` in the `tickets` table has a corresponding entry in the `events` table (foreign key test).
-  - `total_amount` in `tickets.csv` matches `tickets_bought * price_per_ticket` from the `events.csv`.
+### customers_orders_payments.sql
 
-### 5. **Documentation**:
+This model combines order and payment metrics.
 
-- **Objective**: Use dbt's `schema.yml` to document each model, for example:
-  - Describe `events` as event information including event type, capacity, and location.
-  - Describe `tickets` as linking purchases between users and events.
+Hints:
+- Build this model by joining the outputs of the two previous core models.
+- Join on `customer_id`.
+- Keep all customers from the orders model and bring payment totals when available (LEFT JOIN).
+
+### Add core schema file
+
+Create a `schema.yml` file in `models/` to describe these core models.
+
+Hint:
+- Add each model under `models:`
+- Include minimal descriptions and a basic column list (can be expanded later).
+
+### Build all models
+
+    dbt build
+
+## Exercise 3 — Tests (data quality)
+
+### Goal
+
+Add tests to enforce basic data quality assumptions.
+
+The tests are **intentionally not fully provided**.  
+Students are expected to **define most of the tests themselves** based on their understanding of the data and the models built so far.
+
+What to test (high level):
+- Primary keys are **not null** and **unique**
+- Foreign keys reference valid records (**relationships**)
+- Order status values belong to an **accepted set**
+
+Tests must be defined in the corresponding `schema.yml` files.
+
+### Example test (provided as guidance)
+
+Below is **one example** of how a test can be declared in a `schema.yml` file.
+
+This example enforces that the primary key of the `stg_customers` model is not null and unique:
+
+    models:
+      - name: stg_customers
+        columns:
+          - name: customer_id
+            tests:
+              - not_null
+              - unique
+
+This example is meant only as a reference.  
+Students should add additional tests for other models and columns following the same pattern.
+
+### Run tests
+
+    dbt test
+
+If tests fail, inspect the failures and decide whether:
+- the data is incorrect,
+- the transformation logic should be adjusted, or
+- the test definition is too strict or incorrect.
+
+The goal of this exercise is not to have all tests pass immediately, but to understand **how dbt enforces data quality and assumptions**.
+
+
+## Exercise 4 — Documentation
+
+### Goal
+
+Generate and improve dbt documentation.
+
+Generate documentation:
+
+    dbt docs generate
+
+Serve documentation:
+
+    dbt docs serve --port 8080
+
+Open the documentation site in the browser at:
+http://localhost:8080
+
+Improve documentation by:
+- Adding richer descriptions in `schema.yml`
+- Creating Markdown documentation blocks
+- Customizing the overview page
+## Exercise 5 — Macros
+
+### Goal
+
+Reuse SQL logic using macros.
+
+Task:
+- Create a macro that converts cents to currency units.
+- Reuse that macro in your staging models (where amounts are converted).
+- After updating models to use the macro, rebuild staging models.
+
+Where to start:
+- Create a new folder named `macros/` in the dbt project if it does not exist.
+- Create a macro file (e.g., something like `macros/money.sql`) and define a macro inside it.
+
+Hints:
+- A macro is a small reusable SQL snippet written with Jinja.
+- The macro should accept **one argument** (a column name or expression) and return a SQL expression that performs the conversion.
+- To use a macro inside a model, you call it with Jinja syntax: `{{ ... }}`.
+- Replace the hardcoded conversion in your staging model with the macro call.
+
+Suggested mini-checkpoints:
+1. Run `dbt build` before changing anything (baseline).
+2. Create the macro file and rebuild (should still work).
+3. Update **only** the relevant staging model to use the macro.
+4. Rebuild only that model (fast iteration), then rebuild all staging.
+
+
+## Exercise 6 — dbt workflow and selection
+
+### Goal
+
+Practice how dbt is used in a real workflow.
+
+Examples:
+- Build a model and everything downstream from it
+- Build a model and everything upstream from it
+- Run the full pipeline
+
+Where to start:
+- Pick one model in the middle of the DAG (for example, a staging model or a core model).
+- Try running only that model first, then expand the selection.
+
+Hints:
+- dbt selection syntax allows you to run only what you need while still respecting dependencies.
+- The `+` modifier is used to include related models in the graph:
+  - downstream (children)
+  - upstream (parents)
+- Use selection patterns to answer questions like:
+  - “If I change this staging model, what else needs to run?”
+  - “If I want this final model, what dependencies must run first?”
+
+Suggested mini-checkpoints:
+1. Run a single model only.
+2. Run the same model plus everything downstream.
+3. Run a final model plus everything upstream.
+4. Run the full pipeline and compare runtime with the partial runs.
+
+## Extra — Practical Exercise: EventSpark
+
+### Goal
+
+Put into practice the concepts learned in the main exercise by working on a **second, more open-ended dataset**.
+
+This exercise is intentionally less guided and focuses on applying dbt concepts independently, especially **modeling and transformations**.
+
+---
+
+### Dataset overview
+
+The `extra_seeds/` folder contains a dataset for a fictional online event management platform called **EventSpark**.
+
+EventSpark allows users to:
+- create events
+- attend events
+- purchase tickets
+- track event participation
+
+The dataset includes the following tables:
+- `users`
+- `events`
+- `tickets`
+
+These tables are related through a simple event-based domain model (see the EventSpark ER Diagram provided in the repository).
+
+---
+
+### Proposed exercises
+
+The new data can be used to practice dbt modeling concepts.  
+Below are some suggested exercises.
+
+---
+
+### 1. Users model
+
+Objective:  
+Create a `users.sql` model to clean and transform user data.
+
+Hints:
+- Start from the raw `users` seed.
+- Apply light cleaning and normalization.
+- Think about what fields may be useful downstream.
+
+Example transformations:
+- Clean or standardize email domains.
+- Flag users based on region or country.
+- Normalize identifiers or timestamps.
+
+---
+
+### 2. Events model
+
+Objective:  
+Create an `events.sql` model to analyze event characteristics and capacity.
+
+Hints:
+- Start from the raw `events` seed.
+- Focus on event-level attributes and metrics.
+
+Example transformations:
+- Calculate remaining tickets per event.
+- Derive event attendance rates.
+- Categorize events by type or size.
+
+---
+
+### 3. Tickets model
+
+Objective:  
+Create a `tickets.sql` model that joins ticket sales with users and events.
+
+Hints:
+- Use joins to connect tickets to users and events.
+- Treat this model as the main “fact” table of the dataset.
+
+Example transformations:
+- Calculate total revenue per event.
+- Aggregate ticket sales by payment method.
+- Group metrics by user region or event type.
+
+---
+
+### Notes
+
+This extra exercise is intentionally flexible:
+- There is no single correct solution.
+- Focus on applying dbt modeling patterns (staging, refs, joins).
+- Prioritize clarity and consistency over complexity.
+
 
 ## Extra: dbt project creation
 
