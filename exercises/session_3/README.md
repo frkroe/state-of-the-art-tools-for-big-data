@@ -385,7 +385,7 @@ Suggested mini-checkpoints:
 4. Rebuild only that model (fast iteration), then rebuild all staging.
 
 
-## Exercise 6 — dbt workflow and selection
+## Extra — dbt workflow and selection
 
 ### Goal
 
